@@ -18,7 +18,7 @@ The kindle-highlights gem depends on the asin gem to grab data about the product
 
 ## Install
 
-	gem install kindle-highlights
+	gem install siuying-kindle-highlights
 
 ## Usage
 
