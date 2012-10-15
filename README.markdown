@@ -3,7 +3,7 @@ siuying-kindle-highlights
 
 *Get your Kindle highlights via Amazon's Kindle site*
 
-This is a Kindle Highlight API build on top of [speric implementation](https://github.com/speric/kindle-highlights).
+This is a Kindle Highlight API forked from [speric's gem](https://github.com/speric/kindle-highlights).
 
 **Required gems**
 
@@ -16,11 +16,11 @@ The asin gem assumes you have an Associates tracking code, and Product API crede
 
 The kindle-highlights gem depends on the asin gem to grab data about the product from which the highlight came, and will not work without asin being set up properly.
 
-**Install**
-	
+## Install
+
 	gem install kindle-highlights
 
-**Use**
+## Usage
 
 ```ruby
 require 'kindle-highlights'
