@@ -1,10 +1,6 @@
 require 'rubygems'
 require 'mechanize'
-require 'amazon/aws'
-require 'amazon/aws/search'
-
-include Amazon::AWS
-include Amazon::AWS::Search
+require 'asin'
 
 class KindleHighlight
   attr_accessor :highlights
@@ -30,8 +26,9 @@ class KindleHighlight
 end
 
 class KindleHighlight::Highlight
+  include ASIN::Client
 
-  attr_accessor :annotation_id, :asin, :author, :title, :content
+  attr_accessor :annotation_id, :asin, :details_url, :image_url, :title, :author, :content
 
   @@amazon_items = Hash.new
 
@@ -39,20 +36,22 @@ class KindleHighlight::Highlight
     self.annotation_id = highlight.xpath("form/input[@id='annotation_id']").attribute("value").value 
     self.asin = highlight.xpath("p/span[@class='hidden asin']").text
     self.content = highlight.xpath("span[@class='highlight']").text
+
     amazon_item = lookup_or_get_from_cache(self.asin)
-    self.author = amazon_item.item_attributes.author.to_s
-    self.title = amazon_item.item_attributes.title.to_s
+    self.title = amazon_item.title
+    self.author = amazon_item.raw.ItemAttributes.Author rescue nil
+    self.details_url = amazon_item.details_url
+    self.image_url = amazon_item.image_url
   end
 
   def lookup_or_get_from_cache(asin)
     unless @@amazon_items.has_key?(asin)
-      request = Request.new
-      request.locale = 'us'
-      response = ResponseGroup.new('Small')
-      lookup = Amazon::AWS::ItemLookup.new('ASIN', {'ItemId' => asin, 'MerchantId' => 'Amazon'})
-      amazon_item = request.search(lookup, response).item_lookup_response[0].items.item.first
-      @@amazon_items[asin] = amazon_item
+      @@amazon_items[asin] = lookup(asin).first
     end
     @@amazon_items[asin]
+  end
+
+  def to_s
+    "<Highlight##{annotation_id}>"
   end
 end
