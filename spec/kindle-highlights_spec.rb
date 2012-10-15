@@ -37,6 +37,19 @@ describe KindleHighlight do
       first_highlight.end_location.should_not be_nil
     end
 
+    it "allow user getting higlights, with book details" do
+      kindle.scrape_highlights(false)
+      kindle.highlights.size.should > 0
+      kindle.has_more?.should be_true
+      kindle.next_url.should_not be_nil
+
+      first_highlight = kindle.highlights.first
+      first_highlight.author.should be_nil
+      first_highlight.annotation_id.should_not be_nil
+      first_highlight.lookup_item
+      first_highlight.author.should_not be_nil
+    end
+
     it "should get next page highlights" do
       kindle.scrape_highlights
       kindle.highlights.size.should > 0

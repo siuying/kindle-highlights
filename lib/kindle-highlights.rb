@@ -17,7 +17,7 @@ class KindleHighlight
     @amazon_form.password = password
   end
 
-  def scrape_highlights
+  def scrape_highlights(should_lookup_book=true)
     if self.next_url.nil?
       signin_submission = @agent.submit(@amazon_form)
       highlights_page = @agent.click(signin_submission.link_with(:text => /Your Highlights/))
@@ -27,8 +27,8 @@ class KindleHighlight
     end
 
     new_highlights = Array.new
-    highlights_page.search(".//div[@class='highlightRow yourHighlight']").each do |h|
-      new_highlights << Highlight.new(h)
+    highlights_page.search(".//div[@class='highlightRow yourHighlight']").each do |highlight|
+      new_highlights << Highlight.new(highlight, should_lookup_book)
     end
     self.highlights = self.highlights + new_highlights
     self.next_url = highlights_page.search("a#nextBookLink").attribute('href') rescue nil
@@ -48,13 +48,16 @@ class KindleHighlight::Highlight
 
   @@amazon_items = Hash.new
 
-  def initialize(highlight)
+  def initialize(highlight, should_lookup_book=true)
     self.annotation_id = highlight.xpath("form/input[@id='annotation_id']").attribute("value").value 
     self.asin = highlight.xpath("p/span[@class='hidden asin']").text
     self.content = highlight.xpath("span[@class='highlight']").text rescue ""
     self.note = highlight.xpath("span[@class='noteContent']").text rescue ""
     self.end_location = highlight.xpath("span[@class='end_location']").text
+    lookup_item if should_lookup_book
+  end
 
+  def lookup_item
     amazon_item = lookup_or_get_from_cache(self.asin)
     self.title = amazon_item.title
     self.author = amazon_item.raw.ItemAttributes.Author rescue nil
@@ -62,14 +65,15 @@ class KindleHighlight::Highlight
     self.image_url = amazon_item.image_url
   end
 
+  def to_s
+    "<Highlight##{annotation_id}>"
+  end
+
+  private
   def lookup_or_get_from_cache(asin)
     unless @@amazon_items.has_key?(asin)
       @@amazon_items[asin] = lookup(asin).first
     end
     @@amazon_items[asin]
-  end
-
-  def to_s
-    "<Highlight##{annotation_id}>"
   end
 end
