@@ -57,9 +57,9 @@ kindle.highlights.each do |highlight|
 end
 ```
 
-**Updates**
+## Updates
 
-## 0.0.6
+### 0.0.6
 
 * Allow fetch more than one page of highlights
 * Add more fields to highlights
@@ -71,9 +71,9 @@ end
 * Cache AWS Product API results in a Hash, keyed on ASIN, to save time
 * Get Small response group from Amazon
 
-## 0.0.4
+### 0.0.4
 * Added dependencies to Mechanize and ruby-aaws within gemspec (0.0.4)
 
-## 0.0.3
+### 0.0.3
 
 * Added annotation_id to Highlight class (0.0.3)
